@@ -1,0 +1,7 @@
+{
+  "name": "G-Image Studio",
+  "description": "An advanced AI tool that extracts descriptive prompts from uploaded images and generates two high-quality artistic variations using Gemini's latest vision and image models.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
