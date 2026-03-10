@@ -30,7 +30,7 @@ export const extractPromptFromImage = async (base64Image: string): Promise<strin
   Không bao gồm văn bản giới thiệu, chỉ cung cấp nội dung mô tả bằng tiếng Việt.`;
 
   const response: GenerateContentResponse = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
+    model: 'gemini-2.5-flash',
     contents: {
       parts: [
         { inlineData: { data: getBase64FromDataUrl(base64Image), mimeType: 'image/png' } },
