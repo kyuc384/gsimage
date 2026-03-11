@@ -10,12 +10,12 @@ interface StyleSelectorProps {
 export const StyleSelector: React.FC<StyleSelectorProps> = ({ selectedStyleId, onSelect }) => {
   return (
     <section className="max-w-6xl mx-auto px-4 mb-8">
-      <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2">
-        <span className="w-3 h-px bg-slate-700"></span>
+      <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3 flex items-center justify-center gap-2">
+        <span className="w-8 h-px bg-slate-700"></span>
         Chọn phong cách
-        <span className="w-3 h-px bg-slate-700"></span>
+        <span className="w-8 h-px bg-slate-700"></span>
       </h3>
-      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+      <div className="flex flex-wrap justify-center gap-4 pb-4">
         {POPULAR_STYLES.map((style: ImageStyle) => (
           <button
             key={style.id}
