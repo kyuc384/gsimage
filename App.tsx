@@ -187,7 +187,7 @@ const App: React.FC = () => {
       imageZoom: 1,
       extractedPrompt: '',
       manualPrompt: '',
-      selectedStyleId: 'cinematic',
+      selectedStyleId: 'photorealistic',
       variants: [],
       status: AppStatus.IDLE,
       error: null,
