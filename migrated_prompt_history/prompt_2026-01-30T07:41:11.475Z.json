@@ -4,7 +4,7 @@
     "author": "user",
     "payload": {
       "type": "text",
-      "text": "Tôi muốn tạo 1 app cho phép xuất ra prompt từ hình ảnh tải lên , sau đó cho phep tạo ra 2 phiên bản tương tự từ prompt đó",
+      "text": "Tôi muốn tạo 1 app cho phép xuất ra prompt từ hình ảnh tải lên , sau đó cho phép tạo ra 2 phiên bản tương tự từ prompt đó",
       "files": [],
       "fileUploads": [],
       "cMarkNode": {}
