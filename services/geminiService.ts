@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 
 /**
@@ -23,11 +22,9 @@ const getBase64FromDataUrl = (dataUrl: string) => {
 export const extractPromptFromImage = async (base64Image: string): Promise<string> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
   
-  const prompt = `Phân tích hình ảnh này một cách cực kỳ chi tiết bằng tiếng Việt. 
-  Mô tả phong cách, ánh sáng, bảng màu, đối tượng chính, bố cục và tâm trạng. 
-  Tạo một đoạn văn bản mô tả ngắn gọn nhưng đầy đủ (tối đa 100 từ) có thể được sử dụng bởi trình tạo hình ảnh AI 
-  để tái tạo lại một phiên bản tương tự của hình ảnh này. Chỉ tập trung vào các yếu tố hình ảnh. 
-  Không bao gồm văn bản giới thiệu, chỉ cung cấp nội dung mô tả bằng tiếng Việt.`;
+  const prompt = `Bạn là một nhà thiết kế hình ảnh thu nhỏ YouTube chuyên nghiệp và chiến lược gia hình ảnh. 
+  Nhiệm vụ của bạn là phân tích hình thu nhỏ tham khảo trên YouTube này và dựa trên đó mà tạo ra những ý tưởng hình thu nhỏ tốt hơn,
+  giữ các yếu tố đối tượng chính trong hình ảnh, xóa văn bản giới thiệu, chỉ cung cấp nội dung mô tả bằng tiếng Việt.`;
 
   const response: GenerateContentResponse = await ai.models.generateContent({
     model: 'gemini-2.5-flash',
