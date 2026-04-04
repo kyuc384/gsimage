@@ -16,6 +16,7 @@ const App: React.FC = () => {
     status: AppStatus.IDLE,
     error: null,
     activeTab: 'vision',
+    useReferenceImage: true,
   });
 
   const [copied, setCopied] = useState(false);
@@ -111,10 +112,11 @@ const App: React.FC = () => {
       setState(prev => ({ ...prev, status: AppStatus.GENERATING, error: null }));
 
       const styleSuffix = getStyleSuffix(state.selectedStyleId);
+      const referenceImage = state.useReferenceImage ? (state.originalImage || undefined) : undefined;
 
       const variantPromises = [
-        generateImageVariant(state.extractedPrompt, styleSuffix, state.originalImage || undefined),
-        generateImageVariant(state.extractedPrompt, styleSuffix + ", alternative lighting and perspective", state.originalImage || undefined)
+        generateImageVariant(state.extractedPrompt, styleSuffix, referenceImage),
+        generateImageVariant(state.extractedPrompt, styleSuffix + ", alternative lighting and perspective", referenceImage)
       ];
 
       const [v1, v2] = await Promise.all(variantPromises);
@@ -147,10 +149,11 @@ const App: React.FC = () => {
       setState(prev => ({ ...prev, status: AppStatus.GENERATING, error: null, variants: [] }));
       
       const styleSuffix = getStyleSuffix(state.selectedStyleId);
+      const referenceImage = state.useReferenceImage ? (state.originalImage || undefined) : undefined;
 
       const variantPromises = [
-        generateImageVariant(state.manualPrompt, styleSuffix, state.originalImage || undefined),
-        generateImageVariant(state.manualPrompt, styleSuffix + ", slightly different interpretation", state.originalImage || undefined)
+        generateImageVariant(state.manualPrompt, styleSuffix, referenceImage),
+        generateImageVariant(state.manualPrompt, styleSuffix + ", slightly different interpretation", referenceImage)
       ];
 
       const [v1, v2] = await Promise.all(variantPromises);
@@ -192,11 +195,26 @@ const App: React.FC = () => {
       status: AppStatus.IDLE,
       error: null,
       activeTab: state.activeTab, // Keep the current tab
+      useReferenceImage: true,
     });
   };
 
   const setTab = (tab: ActiveTab) => {
     setState(prev => ({ ...prev, activeTab: tab, status: AppStatus.IDLE, variants: [], error: null }));
+  };
+
+  const handleEditVariant = (url: string) => {
+    setState(prev => ({
+      ...prev,
+      originalImage: url,
+      activeTab: 'vision',
+      variants: [],
+      extractedPrompt: '',
+      imageZoom: 1,
+      status: AppStatus.IDLE,
+      error: null
+    }));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCopyPrompt = () => {
@@ -388,6 +406,20 @@ const App: React.FC = () => {
                             disabled={state.status === AppStatus.GENERATING}
                           />
                           <div className="mt-6 pt-4 border-t border-slate-700/50">
+                            {state.originalImage && (
+                              <div className="flex items-center gap-3 mb-4 p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                  <input 
+                                    type="checkbox" 
+                                    className="sr-only peer" 
+                                    checked={state.useReferenceImage}
+                                    onChange={(e) => setState(prev => ({ ...prev, useReferenceImage: e.target.checked }))}
+                                  />
+                                  <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                  <span className="ms-3 text-sm font-medium text-slate-300">Giữ tham chiếu ảnh gốc</span>
+                                </label>
+                              </div>
+                            )}
                             <Button 
                               onClick={handleGenerateVisionaryVariants} 
                               className="w-full"
@@ -410,7 +442,7 @@ const App: React.FC = () => {
                 {state.variants.length > 0 && (
                   <div className="pt-8 border-t border-slate-800">
                     <h2 className="text-2xl font-bold mb-6">Kết quả các biến thể</h2>
-                    <ResultsGrid status={state.status} variants={state.variants} />
+                    <ResultsGrid status={state.status} variants={state.variants} onEdit={handleEditVariant} />
                   </div>
                 )}
               </div>
@@ -429,7 +461,21 @@ const App: React.FC = () => {
                 onChange={(e) => setState(prev => ({ ...prev, manualPrompt: e.target.value }))}
                 disabled={state.status === AppStatus.GENERATING}
               />
-              <div className="mt-6 flex justify-end">
+              <div className="mt-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                {state.originalImage && (
+                  <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        className="sr-only peer" 
+                        checked={state.useReferenceImage}
+                        onChange={(e) => setState(prev => ({ ...prev, useReferenceImage: e.target.checked }))}
+                      />
+                      <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                      <span className="ms-3 text-sm font-medium text-slate-300">Giữ tham chiếu ảnh gốc</span>
+                    </label>
+                  </div>
+                )}
                 <Button 
                   onClick={processCreative} 
                   disabled={!state.manualPrompt.trim()}
@@ -441,7 +487,7 @@ const App: React.FC = () => {
               </div>
             </div>
             {state.status === AppStatus.SUCCESS && state.variants.length > 0 && (
-              <div className="pt-4"><ResultsGrid status={state.status} variants={state.variants} /></div>
+              <div className="pt-4"><ResultsGrid status={state.status} variants={state.variants} onEdit={handleEditVariant} /></div>
             )}
           </div>
         )}
@@ -485,7 +531,7 @@ const App: React.FC = () => {
   );
 };
 
-const ResultsGrid: React.FC<{ status: AppStatus, variants: GeneratedImage[] }> = ({ status, variants }) => {
+const ResultsGrid: React.FC<{ status: AppStatus, variants: GeneratedImage[], onEdit: (url: string) => void }> = ({ status, variants, onEdit }) => {
   const [zoomLevels, setZoomLevels] = useState<Record<string, number>>(
     variants.reduce((acc, v) => ({ ...acc, [v.id]: 1 }), {})
   );
@@ -531,7 +577,16 @@ const ResultsGrid: React.FC<{ status: AppStatus, variants: GeneratedImage[] }> =
             <div className="p-4 flex justify-between items-center">
               <span className="text-slate-400 text-sm">Được tạo bởi AI (16:9)</span>
               <div className="flex gap-2">
-                <a href={variant.url} download={`variant-${index + 1}.png`} className="text-blue-400 hover:text-blue-300 transition-colors p-2 hover:bg-white/5 rounded-lg"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg></a>
+                <button 
+                  onClick={() => onEdit(variant.url)}
+                  className="text-purple-400 hover:text-purple-300 transition-colors p-2 hover:bg-white/5 rounded-lg"
+                  title="Dùng làm ảnh gốc để sửa"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+                <a href={variant.url} download={`variant-${index + 1}.png`} className="text-blue-400 hover:text-blue-300 transition-colors p-2 hover:bg-white/5 rounded-lg" title="Tải xuống"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg></a>
               </div>
             </div>
           </div>

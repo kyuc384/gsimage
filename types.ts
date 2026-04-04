@@ -42,4 +42,5 @@ export interface AppState {
   status: AppStatus;
   error: string | null;
   activeTab: ActiveTab;
+  useReferenceImage: boolean;
 }
