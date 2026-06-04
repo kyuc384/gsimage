@@ -27,7 +27,7 @@ export const extractPromptFromImage = async (base64Image: string): Promise<strin
   giữ các yếu tố đối tượng chính trong hình ảnh, xóa văn bản giới thiệu, chỉ cung cấp nội dung mô tả bằng tiếng Việt.`;
 
   const response: GenerateContentResponse = await ai.models.generateContent({
-    model: 'gemini-3.1-flash-lite',
+    model: 'gemini-3-flash-preview',
     contents: {
       parts: [
         { inlineData: { data: getBase64FromDataUrl(base64Image), mimeType: 'image/png' } },
