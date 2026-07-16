@@ -66,7 +66,7 @@ export const generateImageVariant = async (prompt: string, styleSuffix: string =
   }
 
   const response: GenerateContentResponse = await ai.models.generateContent({
-    model: 'gemini-2.5-flash-image',
+    model: 'gemini-3.1-flash-lite-image',
     contents: {
       parts: parts
     },
@@ -77,7 +77,7 @@ export const generateImageVariant = async (prompt: string, styleSuffix: string =
     }
   });
 
-  // gemini-2.5-flash-image returns the image in candidates[0].content.parts
+  // gemini-3.1-flash-lite-image returns the image in candidates[0].content.parts
   for (const part of response.candidates?.[0]?.content?.parts || []) {
     if (part.inlineData) {
       return `data:image/png;base64,${part.inlineData.data}`;
